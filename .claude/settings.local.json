@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/sazidali/Desktop/projects/vidyalay/app/**)",
+      "Read(//Users/sazidali/Desktop/projects/school_management/vidyalay_backend/**)",
+      "Bash(npx create-next-app@latest:*)"
+    ]
+  }
+}
