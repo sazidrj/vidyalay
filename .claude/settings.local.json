@@ -3,7 +3,14 @@
     "allow": [
       "Read(//Users/sazidali/Desktop/projects/vidyalay/app/**)",
       "Read(//Users/sazidali/Desktop/projects/school_management/vidyalay_backend/**)",
-      "Bash(npx create-next-app@latest:*)"
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(psql postgres:*)",
+      "Bash(createdb vidyalay_db)",
+      "Bash(psql vidyalay_db:*)"
     ]
   }
 }
