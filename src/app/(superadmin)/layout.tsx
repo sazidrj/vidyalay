@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { Role } from "@prisma/client"
-import { signOut } from "next-auth/react"
+import { SignOutButton } from "./SignOutButton"
 
 export default async function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -27,6 +27,7 @@ export default async function SuperAdminLayout({ children }: { children: React.R
         </nav>
         <div className="p-3 border-t border-gray-700">
           <p className="text-sm text-gray-400 px-3 py-2">{session.user.name}</p>
+          <SignOutButton />
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto bg-gray-50">{children}</main>
