@@ -10,7 +10,9 @@
       "Bash(npm run:*)",
       "Bash(psql postgres:*)",
       "Bash(createdb vidyalay_db)",
-      "Bash(psql vidyalay_db:*)"
+      "Bash(psql vidyalay_db:*)",
+      "Bash(ls /Users/sazidali/Desktop/projects/vidyalay2.0/next.config*)",
+      "Bash(node:*)"
     ]
   }
 }

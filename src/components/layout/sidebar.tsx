@@ -91,7 +91,7 @@ function getNavItems(schoolSlug: string): NavItem[] {
       label: "Settings",
       href: `/${schoolSlug}/settings`,
       icon: Settings,
-      roles: [Role.ADMIN],
+      roles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
     },
   ]
 }
