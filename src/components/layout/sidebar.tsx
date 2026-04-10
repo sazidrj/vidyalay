@@ -15,6 +15,7 @@ import {
   Settings,
   LogOut,
   GraduationCap,
+  X,
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 
@@ -101,9 +102,10 @@ interface SidebarProps {
   schoolName: string
   userRole: Role
   userName: string
+  onClose?: () => void
 }
 
-export function Sidebar({ schoolSlug, schoolName, userRole, userName }: SidebarProps) {
+export function Sidebar({ schoolSlug, schoolName, userRole, userName, onClose }: SidebarProps) {
   const pathname = usePathname()
   const navItems = getNavItems(schoolSlug).filter((item) => item.roles.includes(userRole))
 
@@ -118,13 +120,18 @@ export function Sidebar({ schoolSlug, schoolName, userRole, userName }: SidebarP
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-full shrink-0">
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+          <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
             {schoolName.charAt(0)}
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden flex-1">
             <p className="font-semibold text-sm text-gray-900 truncate">{schoolName}</p>
             <p className="text-xs text-gray-500">{roleLabel[userRole] ?? userRole}</p>
           </div>
+          {onClose && (
+            <button onClick={onClose} className="md:hidden p-1 text-gray-400 hover:text-gray-700">
+              <X size={18} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -139,6 +146,7 @@ export function Sidebar({ schoolSlug, schoolName, userRole, userName }: SidebarP
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-indigo-50 text-indigo-700"
