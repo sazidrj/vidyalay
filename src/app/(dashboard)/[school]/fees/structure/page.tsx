@@ -38,7 +38,7 @@ export default function FeeStructurePage() {
       ])
       const [ftData, clData] = await Promise.all([ftRes.json(), clRes.json()])
       setFeeTypes(ftData.data ?? [])
-      setClasses((clData.data ?? []).filter((c: ClassSection & { isActive?: boolean }) => c.isActive !== false))
+      setClasses(clData.data ?? [])
       setLoading(false)
     }
     init()
