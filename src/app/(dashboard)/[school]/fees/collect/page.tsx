@@ -3,8 +3,9 @@
 import { Fragment, useState } from "react"
 import { useParams } from "next/navigation"
 
-interface Student { id: number; fullName: string; studentUid: string; fatherName: string; classSection: { className: string; section: string } | null }
+interface Student { id: number; fullName: string; studentUid: string; fatherName: string; classSectionId: number | null; classSection: { id: number; className: string; section: string } | null }
 interface FeeType { id: number; name: string; amount: number }
+interface FeeStructure { feeTypeId: number; classSectionId: number; amount: number; dueDate: string | null }
 interface PaymentTx { id: number; amount: number; paymentMode: string; paidDate: string; receiptNumber: string | null }
 interface FeeRecord {
   id: number
@@ -24,6 +25,7 @@ export default function CollectFeePage() {
   const [selected, setSelected] = useState<Student | null>(null)
   const [feeTypes, setFeeTypes] = useState<FeeType[]>([])
   const [feeRecords, setFeeRecords] = useState<FeeRecord[]>([])
+  const [feeStructures, setFeeStructures] = useState<FeeStructure[]>([])
   const [searching, setSearching] = useState(false)
   const [payForm, setPayForm] = useState<{ recordId: number; amount: string; mode: string; balance: number } | null>(null)
   const [newFeeForm, setNewFeeForm] = useState<{ feeTypeId: string; dueDate: string } | null>(null)
@@ -45,12 +47,20 @@ export default function CollectFeePage() {
     setStudents([])
     setSearch(student.fullName)
     setMessage("")
-    const [feesRes, typesRes] = await Promise.all([
+    const [feesRes, typesRes, infoRes] = await Promise.all([
       fetch(`/api/${params.school}/fees/records?studentId=${student.id}&pageSize=50`).then(r => r.json()),
       fetch(`/api/${params.school}/fees/types`).then(r => r.json()),
+      fetch(`/api/${params.school}/settings/info`).then(r => r.json()),
     ])
     setFeeRecords(feesRes.data ?? [])
     setFeeTypes(typesRes.data ?? [])
+    // Load fee structures for this student's class
+    const currentSession = infoRes.data?.currentSession ?? ""
+    if (currentSession) {
+      const structRes = await fetch(`/api/${params.school}/fees/structure?session=${encodeURIComponent(currentSession)}`)
+      const structData = await structRes.json()
+      setFeeStructures(structData.data ?? [])
+    }
   }
 
   async function collectPayment() {
@@ -73,14 +83,39 @@ export default function CollectFeePage() {
     if (d.success && selected) selectStudent(selected)
   }
 
+  function getAmountForClass(feeTypeId: number): number {
+    const classId = selected?.classSectionId ?? selected?.classSection?.id
+    if (classId) {
+      const structure = feeStructures.find(s => s.feeTypeId === feeTypeId && s.classSectionId === classId)
+      if (structure) return Number(structure.amount)
+    }
+    // Fall back to FeeType default amount
+    const ft = feeTypes.find(f => f.id === feeTypeId)
+    return Number(ft?.amount ?? 0)
+  }
+
+  function getDueDateForClass(feeTypeId: number): string | undefined {
+    const classId = selected?.classSectionId ?? selected?.classSection?.id
+    if (!classId) return undefined
+    const structure = feeStructures.find(s => s.feeTypeId === feeTypeId && s.classSectionId === classId)
+    return structure?.dueDate?.slice(0, 10) ?? undefined
+  }
+
   async function createFeeRecord() {
     if (!newFeeForm || !selected) return
     setSaving(true)
-    const ft = feeTypes.find(f => f.id === parseInt(newFeeForm.feeTypeId))
+    const feeTypeId = parseInt(newFeeForm.feeTypeId)
+    const amountDue = getAmountForClass(feeTypeId)
+    const structureDueDate = getDueDateForClass(feeTypeId)
     const res = await fetch(`/api/${params.school}/fees/records`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ studentId: selected.id, feeTypeId: parseInt(newFeeForm.feeTypeId), amountDue: parseFloat(String(ft?.amount ?? 0)), dueDate: newFeeForm.dueDate || undefined }),
+      body: JSON.stringify({
+        studentId: selected.id,
+        feeTypeId,
+        amountDue,
+        dueDate: newFeeForm.dueDate || structureDueDate || undefined,
+      }),
     })
     const d = await res.json()
     setSaving(false)
@@ -183,7 +218,10 @@ export default function CollectFeePage() {
                   <select value={newFeeForm.feeTypeId} onChange={e => setNewFeeForm({ ...newFeeForm, feeTypeId: e.target.value })}
                     className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm">
                     <option value="">Select fee type</option>
-                    {feeTypes.map(ft => <option key={ft.id} value={ft.id}>{ft.name} — ₹{Number(ft.amount).toLocaleString("en-IN")}</option>)}
+                    {feeTypes.map(ft => {
+                      const amt = getAmountForClass(ft.id)
+                      return <option key={ft.id} value={ft.id}>{ft.name} — ₹{amt.toLocaleString("en-IN")}</option>
+                    })}
                   </select>
                 </div>
                 <div>

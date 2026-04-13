@@ -12,7 +12,9 @@
       "Bash(createdb vidyalay_db)",
       "Bash(psql vidyalay_db:*)",
       "Bash(ls /Users/sazidali/Desktop/projects/vidyalay2.0/next.config*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(echo \"EXIT:$?\")"
     ]
   }
 }

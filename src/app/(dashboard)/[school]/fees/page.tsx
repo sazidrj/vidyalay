@@ -77,6 +77,9 @@ export default async function FeesPage({ params, searchParams }: Props) {
           <Link href={`/${school}/fees/types`} className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
             Fee Types
           </Link>
+          <Link href={`/${school}/fees/structure`} className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50">
+            Fee Structure
+          </Link>
           <Link href={`/${school}/fees/collect`} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
             Collect Fee
           </Link>

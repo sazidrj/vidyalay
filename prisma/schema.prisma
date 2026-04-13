@@ -71,6 +71,7 @@ model School {
   classes              ClassSection[]
   subjects             Subject[]
   feeTypes             FeeType[]
+  feeStructures        FeeStructure[]
   feeRecords           FeeRecord[]
   examTypes            ExamType[]
   exams                Exam[]
@@ -130,6 +131,7 @@ model ClassSection {
   students           Student[]
   exams              Exam[]
   teacherAssignments TeacherAssignment[]
+  feeStructures      FeeStructure[]
 
   @@unique([schoolId, className, section])
   @@index([schoolId])
@@ -292,15 +294,34 @@ model FeeType {
   school            School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   name              String  @db.VarChar(100)
   description       String? @db.Text
-  amount            Decimal @db.Decimal(12, 2)
+  amount            Decimal @default(0) @db.Decimal(12, 2)
   isMonthly         Boolean @default(false)
   isActive          Boolean @default(true)
   applicableClasses Json?
 
-  records FeeRecord[]
+  records    FeeRecord[]
+  structures FeeStructure[]
 
   @@unique([schoolId, name])
   @@index([schoolId])
+}
+
+model FeeStructure {
+  id             Int          @id @default(autoincrement())
+  schoolId       Int
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  feeTypeId      Int
+  feeType        FeeType      @relation(fields: [feeTypeId], references: [id], onDelete: Cascade)
+  classSectionId Int
+  classSection   ClassSection @relation(fields: [classSectionId], references: [id], onDelete: Cascade)
+  amount         Decimal      @db.Decimal(12, 2)
+  dueDate        DateTime?    @db.Date
+  session        String       @db.VarChar(20)
+  isActive       Boolean      @default(true)
+
+  @@unique([schoolId, feeTypeId, classSectionId, session])
+  @@index([schoolId])
+  @@index([classSectionId])
 }
 
 model FeeRecord {
