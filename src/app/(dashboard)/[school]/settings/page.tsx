@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { hasPermission } from "@/lib/permissions"
 import { Role } from "@prisma/client"
 import { ChangePasswordForm } from "./ChangePasswordForm"
+import { ClassesManager } from "./ClassesManager"
 
 interface Props {
   params: Promise<{ school: string }>
@@ -36,6 +37,9 @@ export default async function SettingsPage({ params }: Props) {
 
       {/* Change Password — available to everyone */}
       <ChangePasswordForm />
+
+      {/* Classes — admin only */}
+      {isAdmin && <ClassesManager />}
 
       {/* School Profile — admin only */}
       {isAdmin && schoolData && (
